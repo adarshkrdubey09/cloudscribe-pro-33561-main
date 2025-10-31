@@ -1,0 +1,217 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Professional Notebook Design System - Premium Dark Theme */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 151 100% 27%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 151 50% 95%;
+    --accent-foreground: 151 100% 27%;
+
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 96%;
+    --ring: 151 100% 27%;
+
+    --radius: 0.75rem;
+
+    /* Premium Color Palette */
+    --gradient-primary: linear-gradient(135deg, hsl(151 100% 27%), hsl(151 100% 35%));
+    --gradient-surface: linear-gradient(135deg, hsl(0 0% 98%), hsl(0 0% 100%));
+    --gradient-accent: linear-gradient(135deg, hsl(151 50% 95%), hsl(151 50% 98%));
+    
+    /* Surface Colors */
+    --surface-elevated: 0 0% 98%;
+    --surface-overlay: 0 0% 96%;
+    --surface-interactive: 0 0% 94%;
+    
+    /* Semantic Colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 48 96% 53%;
+    --warning-foreground: 0 0% 10%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    
+    /* Premium Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.08);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.15), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
+    --shadow-glow: 0 0 20px hsl(151 100% 27% / 0.3);
+    
+    /* Animations */
+    --animation-fast: 150ms ease-out;
+    --animation-normal: 250ms ease-out;
+    --animation-slow: 350ms ease-out;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 151 100% 27%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 151 50% 95%;
+    --accent-foreground: 151 100% 27%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 96%;
+    --ring: 151 100% 27%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 151 100% 27%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 151 100% 27%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer components {
+  .surface-elevated {
+    background: hsl(var(--surface-elevated));
+    border: 1px solid hsl(var(--border));
+  }
+  
+  .surface-overlay {
+    background: hsl(var(--surface-overlay));
+  }
+  
+  .surface-interactive {
+    background: hsl(var(--surface-interactive));
+    transition: background var(--animation-fast);
+  }
+  
+  .surface-interactive:hover {
+    background: hsl(var(--surface-overlay));
+  }
+  
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-surface {
+    background: var(--gradient-surface);
+  }
+  
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+  
+  .shadow-premium {
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn var(--animation-normal) ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp var(--animation-normal) ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn var(--animation-fast) ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
