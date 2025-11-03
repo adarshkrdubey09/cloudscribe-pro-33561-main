@@ -7,7 +7,8 @@ import {
   Grid3X3, 
   User,
   Edit3,
-  Check
+  Check,
+  Menu
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -18,9 +19,10 @@ import {
 
 interface NotebookHeaderProps {
   onLogout: () => void;
+  onToggleSources: () => void;
 }
 
-export function NotebookHeader({ onLogout }: NotebookHeaderProps) {
+export function NotebookHeader({ onLogout, onToggleSources }: NotebookHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [notebookName, setNotebookName] = useState("AI CHAT BOT TENDER");
 
@@ -35,6 +37,15 @@ export function NotebookHeader({ onLogout }: NotebookHeaderProps) {
   return (
     <header className="h-14 md:h-16 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-4 md:px-6">
       <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onToggleSources}
+          className="flex-shrink-0"
+        >
+          <Menu className="w-4 h-4" />
+        </Button>
+        
         <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
           <Grid3X3 className="w-3 h-3 md:w-4 md:h-4 text-primary-foreground" />
         </div>
