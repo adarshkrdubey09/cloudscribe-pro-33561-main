@@ -81,11 +81,11 @@ export function NotebookLayout({ onLogout }: NotebookLayoutProps) {
           className={`
             transition-all duration-300 ease-in-out
             ${sourcesOpen 
-              ? 'w-full sm:w-80 md:w-96' 
+              ? 'w-full sm:w-80 md:w-96 lg:w-[400px]' 
               : 'w-0'
             }
             ${sourcesOpen ? 'fixed sm:relative' : 'relative'}
-            ${sourcesOpen ? 'left-0 top-14 md:top-16 bottom-0' : ''}
+            ${sourcesOpen ? 'left-0 top-14 md:top-16 lg:top-12 bottom-0' : ''}
             ${sourcesOpen ? 'z-40 sm:z-30' : 'z-30'}
             flex-shrink-0 border-r border-border overflow-hidden bg-background sm:bg-transparent
           `}

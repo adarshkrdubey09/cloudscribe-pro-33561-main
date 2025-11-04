@@ -117,34 +117,36 @@ export function ChatPanel({ onFileUpload, sourcesOpen = true }: ChatPanelProps) 
         <h2 className="text-base sm:text-lg font-semibold">Chat</h2>
       </div>
 
-      <ScrollArea className="flex-1 p-3 sm:p-4 md:p-6 pb-40 sm:pb-44 md:pb-48 overflow-y-auto" ref={scrollAreaRef}>
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl gradient-primary flex items-center justify-center mb-4 sm:mb-6 shadow-glow animate-scale-in">
-              <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground" />
+      <ScrollArea className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 pb-36 sm:pb-40 md:pb-36 lg:pb-40 overflow-y-auto" ref={scrollAreaRef}>
+        <div className="max-w-3xl lg:max-w-4xl mx-auto w-full h-full">
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center px-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl gradient-primary flex items-center justify-center mb-4 sm:mb-6 shadow-glow animate-scale-in">
+                <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">How can I help?</h3>
+              <p className="text-sm sm:text-base text-muted-foreground mb-8 max-w-md leading-relaxed">
+                Need help with brainstorming, writing AI Tender Chat Bot anything!
+              </p>
             </div>
-            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">How can I help?</h3>
-            <p className="text-sm sm:text-base text-muted-foreground mb-8 max-w-md leading-relaxed">
-              Need help with brainstorming, writing AI Tender Chat Bot anything!
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto w-full">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex gap-2 sm:gap-3 animate-fade-in ${message.type === "user" ? "justify-end" : "justify-start"}`}
-              >
-                {message.type === "assistant" && (
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0 shadow-premium">
-                    <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-                  </div>
-                )}
+          ) : (
+            <div className="space-y-4 sm:space-y-6">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex gap-2 sm:gap-3 animate-fade-in ${
+                    message.type === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  {message.type === "assistant" && (
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0 shadow-premium">
+                      <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+                    </div>
+                  )}
 
-                <div className="flex-1 min-w-0">
                   <div
-                    className={`max-w-[90%] sm:max-w-[85%] md:max-w-[70%] p-3 sm:p-4 rounded-xl shadow-premium group relative ${
-                      message.type === "user" ? "gradient-primary text-primary-foreground ml-auto" : "surface-elevated"
+                    className={`p-3 sm:p-4 rounded-xl shadow-premium group relative max-w-[85%] sm:max-w-[75%] md:max-w-[65%] ${
+                      message.type === "user" ? "gradient-primary text-primary-foreground" : "surface-elevated"
                     }`}
                   >
                     {/* ✅ Markdown Renderer */}
@@ -185,44 +187,44 @@ export function ChatPanel({ onFileUpload, sourcesOpen = true }: ChatPanelProps) 
                       )}
                     </div>
                   </div>
-                </div>
 
-                {message.type === "user" && (
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl surface-elevated flex items-center justify-center flex-shrink-0 shadow-premium">
-                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
-                )}
-              </div>
-            ))}
+                  {message.type === "user" && (
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl surface-elevated flex items-center justify-center flex-shrink-0 shadow-premium">
+                      <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </div>
+                  )}
+                </div>
+              ))}
 
-            {isTyping && (
-              <div className="flex gap-2 sm:gap-3 justify-start animate-fade-in">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0 shadow-premium">
-                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-                </div>
-                <div className="surface-elevated p-3 sm:p-4 rounded-xl shadow-premium">
-                  <div className="flex gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
-                    <div
-                      className="w-2 h-2 rounded-full bg-primary animate-bounce"
-                      style={{ animationDelay: "150ms" }}
-                    />
-                    <div
-                      className="w-2 h-2 rounded-full bg-primary animate-bounce"
-                      style={{ animationDelay: "300ms" }}
-                    />
+              {isTyping && (
+                <div className="flex gap-2 sm:gap-3 justify-start animate-fade-in">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0 shadow-premium">
+                    <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+                  </div>
+                  <div className="surface-elevated p-3 sm:p-4 rounded-xl shadow-premium">
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
+                      <div
+                        className="w-2 h-2 rounded-full bg-primary animate-bounce"
+                        style={{ animationDelay: "150ms" }}
+                      />
+                      <div
+                        className="w-2 h-2 rounded-full bg-primary animate-bounce"
+                        style={{ animationDelay: "300ms" }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
       </ScrollArea>
 
       {/* Input Bar - Fixed at bottom */}
-      <div className="absolute bottom-6 md:bottom-0   left-0 right-0 p-3 sm:p-6 md:p-4 border-t border-border/50 surface-elevated backdrop-blur-md bg-background/95 z-10 safe-bottom">
-        <div className="max-w-4xl mx-auto">
+      <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-4 lg:p-5 border-t border-border/50 surface-elevated backdrop-blur-md bg-background/95 z-10 safe-bottom">
+        <div className="max-w-3xl lg:max-w-4xl mx-auto">
           <div className="flex items-end gap-2 md:gap-3">
             <div className="flex-1 relative min-w-0">
               <div className="relative rounded-xl transition-all duration-300 ring-1 ring-border/50 shadow-premium hover:ring-border hover:shadow-glow">
@@ -248,13 +250,13 @@ export function ChatPanel({ onFileUpload, sourcesOpen = true }: ChatPanelProps) 
             </Button>
           </div>
 
-          <div className="flex items-center justify-center mt-2 sm:mt-3 text-xs text-muted-foreground/70 px-2">
+          {/* <div className="flex items-center justify-center mt-2 sm:mt-3 text-xs text-muted-foreground/70 px-2">
             <span className="hidden md:inline transition-colors hover:text-muted-foreground">
               <kbd className="px-1.5 py-0.5 rounded bg-muted/50 text-[10px] font-medium">Enter</kbd> to send •
               <kbd className="px-1.5 py-0.5 rounded bg-muted/50 text-[10px] font-medium ml-1">Shift+Enter</kbd> for new
               line
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

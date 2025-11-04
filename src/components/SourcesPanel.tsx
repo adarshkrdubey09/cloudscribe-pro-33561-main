@@ -1,8 +1,9 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, FileText, Upload, Trash2, Eye, X } from "lucide-react";
+import { Plus, FileText, Upload, Trash2, Eye, X, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,12 @@ interface SourcesPanelProps {
   onDeleteSource?: (id: string) => void;
 }
 
+interface UploadProgress {
+  id: string;
+  name: string;
+  progress: number;
+}
+
 export function SourcesPanel({
   onClose,
   onFileAdd,
@@ -35,20 +42,21 @@ export function SourcesPanel({
   const [localSources, setLocalSources] = useState<Source[]>([]);
   const [previewSource, setPreviewSource] = useState<Source | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState<UploadProgress[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const sources = externalSources.length > 0 ? externalSources : localSources;
+  // Always use localSources for display
+  const sources = localSources;
 
   const getSourceIcon = (type: Source["type"]) => {
     return <FileText className="w-4 h-4 text-red-400" />;
   };
 
   const handleDeleteSource = (id: string) => {
+    setLocalSources((prev) => prev.filter((source) => source.id !== id));
     if (externalDeleteSource) {
       externalDeleteSource(id);
-    } else {
-      setLocalSources(localSources.filter((source) => source.id !== id));
     }
     toast({
       title: "Source removed",
@@ -64,70 +72,121 @@ export function SourcesPanel({
         description: "Only PDF files are allowed",
         variant: "destructive",
       });
-      return;
+      return false;
     }
-
-    // If external sources are managed by parent, only notify parent
-    if (externalDeleteSource && onFileAdd) {
-      onFileAdd(file);
-    } else {
-      // Otherwise manage locally
-      const newSource: Source = {
-        id: Date.now().toString(),
-        name: file.name,
-        type: "pdf",
-        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-        uploadedAt: new Date(),
-      };
-      setLocalSources((prev) => [...prev, newSource]);
-    }
-
-    toast({
-      title: "File uploaded",
-      description: `${file.name} has been added to sources`,
-    });
+    return true;
   };
 
-  // ✅ Reusable API upload function
-  async function uploadFile(file: File) {
+  const addSourceLocally = (file: File) => {
+    const newSource: Source = {
+      id: Date.now().toString() + Math.random().toString(),
+      name: file.name,
+      type: "pdf",
+      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+      uploadedAt: new Date(),
+    };
+    
+    if (onFileAdd) {
+      onFileAdd(file);
+    }
+    setLocalSources((prev) => [...prev, newSource]);
+  };
+
+  // ✅ Upload multiple files to API
+  async function uploadFiles(files: File[]) {
     const formData = new FormData();
-    formData.append("file", file);
+    
+    // Add all files to FormData with key "files"
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    // Track progress for each file
+    const progressIds = files.map((file) => ({
+      id: Date.now().toString() + Math.random().toString(),
+      name: file.name,
+      progress: 0,
+    }));
+    
+    setUploadingFiles(progressIds);
 
     try {
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setUploadingFiles((prev) =>
+          prev.map((item) => ({
+            ...item,
+            progress: Math.min(item.progress + 10, 90),
+          }))
+        );
+      }, 200);
+
       const response = await fetch("https://dev.ai.rosmerta.dev/tender/api/pdf/upload-pdf/", {
         method: "POST",
         body: formData,
       });
 
+      clearInterval(progressInterval);
+
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
 
       const data = await response.json();
-      console.log("✅ Upload success:", data);
+      
+      // Complete progress
+      setUploadingFiles((prev) =>
+        prev.map((item) => ({
+          ...item,
+          progress: 100,
+        }))
+      );
 
-      // Optional toast for UI feedback
+      // Add to local sources first
+      files.forEach((file) => addSourceLocally(file));
+
+      // Remove progress bars after showing 100%
+      setTimeout(() => {
+        setUploadingFiles([]);
+      }, 800);
+
       toast({
-        title: "File uploaded successfully",
-        description: `${file.name} has been uploaded.`,
+        title: "Files uploaded successfully",
+        description: `${files.length} file${files.length > 1 ? 's' : ''} uploaded.`,
       });
 
       return data;
     } catch (error) {
       console.error("❌ Upload failed:", error);
+      
+      // Still add files locally even if API fails (for demo purposes)
+      files.forEach((file) => addSourceLocally(file));
+      
+      // Remove progress bars
+      setTimeout(() => {
+        setUploadingFiles([]);
+      }, 500);
+      
       toast({
-        title: "Upload failed",
-        description: "There was an error uploading your file.",
-        variant: "destructive",
+        title: "Files added locally",
+        description: "API upload failed, but files are added to the list.",
+        variant: "default",
       });
     }
   }
 
-  // ✅ Handle file upload (from input)
+  // ✅ Handle file upload (from input) - supports multiple files
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      processFile(file); // local state
-      uploadFile(file); // server upload
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+
+    const files = Array.from(fileList);
+    const validFiles = files.filter((file) => processFile(file));
+
+    if (validFiles.length > 0) {
+      uploadFiles(validFiles);
     }
+
+    // Reset input
+    e.target.value = "";
   };
 
   // ✅ Handle drag over (for highlighting)
@@ -144,7 +203,7 @@ export function SourcesPanel({
     setIsDragging(false);
   };
 
-  // ✅ Handle drop (for drag-and-drop uploads)
+  // ✅ Handle drop (for drag-and-drop uploads) - supports multiple files
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -152,9 +211,11 @@ export function SourcesPanel({
 
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
-      const file = files[0];
-      processFile(file); // local display
-      uploadFile(file); // send to API
+      const validFiles = files.filter((file) => processFile(file));
+      
+      if (validFiles.length > 0) {
+        uploadFiles(validFiles);
+      }
     }
   };
 
@@ -165,7 +226,14 @@ export function SourcesPanel({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <input ref={fileInputRef} type="file" onChange={handleFileUpload} className="hidden" accept=".pdf" />
+      <input 
+        ref={fileInputRef} 
+        type="file" 
+        onChange={handleFileUpload} 
+        className="hidden" 
+        accept=".pdf" 
+        multiple 
+      />
       <div className="p-3 sm:p-4 md:p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <h2 className="text-base sm:text-lg font-semibold">Sources</h2>
@@ -192,7 +260,7 @@ export function SourcesPanel({
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem className="gap-2" onClick={() => fileInputRef.current?.click()}>
                 <Upload className="w-4 h-4" />
-                Upload PDF File
+                Upload PDF Files
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -210,21 +278,42 @@ export function SourcesPanel({
           >
             <FileText className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-muted-foreground mx-auto mb-2 sm:mb-3" />
             <p className="text-muted-foreground text-xs sm:text-sm mb-1">
-              {isDragging ? "Drop PDF here" : "Drag & drop PDF"}
+              {isDragging ? "Drop PDFs here" : "Drag & drop PDFs"}
             </p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">
-              {isDragging ? "Release to upload" : "or click to browse"}
+              {isDragging ? "Release to upload" : "or click to browse (multiple files)"}
             </p>
           </div>
         </div>
 
+        {/* Progress bars for uploading files */}
+        {uploadingFiles.length > 0 && (
+          <div className="px-3 sm:px-4 md:px-4 pb-3 sm:pb-4 md:pb-4 space-y-2 sm:space-y-3">
+            <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">Uploading...</h3>
+            {uploadingFiles.map((file) => (
+              <Card key={file.id} className="p-2 sm:p-3 surface-elevated">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin text-primary flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium truncate">{file.name}</p>
+                    <Progress value={file.progress} className="h-1.5 sm:h-2 mt-1.5 sm:mt-2" />
+                  </div>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground flex-shrink-0">
+                    {file.progress}%
+                  </span>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
         {/* Scrollable uploaded files section */}
         {sources.length > 0 && (
-          <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-4 pb-3 sm:pb-4 md:pb-4">
-            <div className="mb-2">
+          <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-4">
+            <div className="mb-2 pt-2">
               <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">Uploaded Files ({sources.length})</h3>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 pb-6">
               {sources.map((source) => (
                 <Card key={source.id} className="p-2 sm:p-3 surface-elevated hover:surface-interactive transition-colors group">
                   <div className="flex items-start gap-2 sm:gap-3">
